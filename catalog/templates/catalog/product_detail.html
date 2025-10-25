@@ -26,8 +26,8 @@
     <p>Описание товара - {{ product.description }}</p>
     <p>Фото товара - {{ product.image }}</p>
     <p>Категория товара - {{ product.category }}</p>
-    <p>Дата создания - {{ product.created_at }}</p>
-    <p>Дата обновления - {{ product.updated_at }}</p>
+    <p>Дата создания - {{ product.created_at|date:"d M Y" }}</p>
+    <p>Дата обновления - {{ product.updated_at|date:"d M Y" }}</p>
 
 </div>
 
