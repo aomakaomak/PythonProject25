@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from catalog.models import Product
+from django.shortcuts import render, get_object_or_404
 
-# Create your views here.
 
 def home(request):
     products = Product.objects.all()
@@ -23,7 +23,7 @@ def contacts(request):
 
 
 def product_detail(request, product_id):
-    product = Product.objects.get(id=product_id)
+    product = get_object_or_404(Product, id=product_id)
     context = {
         'product': product,
     }
