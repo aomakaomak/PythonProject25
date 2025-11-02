@@ -6,7 +6,7 @@ class BlogPost(models.Model):
     content = models.TextField(verbose_name='Содержимое')
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_published = models.BooleanField(verbose_name='Опубликовано или нет')
+    is_published = models.BooleanField(default=True, verbose_name='Опубликовано или нет')
     views_count = models.IntegerField(default=0)
 
 
