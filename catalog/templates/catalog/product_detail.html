@@ -24,7 +24,12 @@
 <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
 <a href="{% url 'catalog:home' %}" class="btn btn-primary">Вернуться к списку</a>
 
-
+{% if 'catalog.can_unpublish_product' in perms %}
+    <form method="post" action="{% url 'catalog:product_is_published' product.id %}">
+        {% csrf_token %}
+        <button type="submit">Публиковать</button>
+    </form>
+{% endif %}
 
 {% endblock %}
 

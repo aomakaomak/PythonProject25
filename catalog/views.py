@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -7,8 +7,21 @@ from catalog.models import Product
 from .forms import ProductForm
 from django.shortcuts import render, get_object_or_404
 
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+
+class IsPublishedProductView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        product = get_object_or_404(Product, id=pk)
+
+        if not request.user.has_perm('catalog.can_unpublish_product'):
+            return HttpResponseForbidden('У вас нет права для изменения статуса продукта')
+
+        product.is_published = True
+        product.save()
+
+        return redirect('catalog:product_detail', pk=pk)
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):

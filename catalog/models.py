@@ -20,6 +20,7 @@ class Product(models.Model):
     price = models.IntegerField()
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
+    is_published = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name} за {self.price}'
@@ -28,3 +29,6 @@ class Product(models.Model):
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
         ordering = ['name']
+        permissions = [
+            ('can_unpublish_product', 'Can unpublish product'),
+        ]
