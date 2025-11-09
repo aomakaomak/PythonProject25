@@ -30,12 +30,21 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:home')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:home')
+    permission_required = 'catalog.change_product'
+
+    def has_permission(self):
+        obj = self.get_object()
+        return super().has_permission() or obj.owner == self.request.user
 
 
 class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -43,6 +52,12 @@ class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:home')
     permission_required = 'catalog.delete_product'
+
+    def has_permission(self):
+        obj = self.get_object()
+        return super().has_permission() or (
+                obj.owner == self.request.user or self.request.user.groups.filter(name='Модератор продуктов').exists()
+        )
 
     def handle_no_permission(self):
         return HttpResponseForbidden('У вас нет права на удаление продукта')
