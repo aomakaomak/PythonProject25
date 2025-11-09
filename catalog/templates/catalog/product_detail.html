@@ -21,7 +21,9 @@
 </div>
 
 <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary">Редактировать</a>
+{% if 'catalog.delete_product' in perms %}
 <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+{% endif %}
 <a href="{% url 'catalog:home' %}" class="btn btn-primary">Вернуться к списку</a>
 
 {% if 'catalog.can_unpublish_product' in perms %}
