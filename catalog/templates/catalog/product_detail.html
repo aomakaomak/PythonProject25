@@ -19,12 +19,20 @@
     <p>Дата обновления - {{ product.updated_at|date:"d M Y" }}</p>
 
 </div>
-
+{% if request.user == product.owner or perms.catalog.change_product %}
 <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-secondary">Редактировать</a>
+{% endif %}
+{% if request.user == product.owner or perms.catalog.delete_product %}
 <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+{% endif %}
 <a href="{% url 'catalog:home' %}" class="btn btn-primary">Вернуться к списку</a>
 
-
+{% if perms.catalog.unpublish_product %}
+    <form method="post" action="{% url 'catalog:product_is_published' product.id %}">
+        {% csrf_token %}
+        <button type="submit">Публиковать</button>
+    </form>
+{% endif %}
 
 {% endblock %}
 
