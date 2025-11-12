@@ -2,13 +2,28 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 from catalog.models import Product
 from .forms import ProductForm
+from .services import ProductListInCategory
 from django.shortcuts import render, get_object_or_404
 
 from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+
+class ProductByCategoryView(ListView):
+    model = Product
+    template_name = 'catalog/products_by_category.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return ProductListInCategory.product_list(category_id)
+
 
 
 class IsPublishedProductView(LoginRequiredMixin, View):
@@ -68,6 +83,13 @@ class ProductListView(ListView):
     template_name = 'catalog/home.html'
     context_object_name = 'products'
 
+    def get_queryset(self):
+        queryset = cache.get('products_queryset')
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set('products_queryset', queryset, 60 * 15)
+        return queryset
+
 
 # def home(request):
 #     products = Product.objects.all()
@@ -94,7 +116,7 @@ class ContactsView(TemplateView):
 #         return HttpResponse(f'{name}, спасибо за сообщение')
 #     return render(request, 'catalog/contacts.html')
 
-
+@method_decorator(cache_page(60*15), name='dispatch')
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = 'catalog/product_detail.html'
