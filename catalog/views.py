@@ -25,6 +25,7 @@ class ProductByCategoryView(ListView):
         return ProductListInCategory.product_list(category_id)
 
 
+
 class IsPublishedProductView(LoginRequiredMixin, View):
     def post(self, request, pk):
         product = get_object_or_404(Product, id=pk)
@@ -81,6 +82,13 @@ class ProductListView(ListView):
     model = Product
     template_name = 'catalog/home.html'
     context_object_name = 'products'
+
+    def get_queryset(self):
+        queryset = cache.get('products_queryset')
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set('products_queryset', queryset, 60 * 15)
+        return queryset
 
 
 # def home(request):
