@@ -8,10 +8,21 @@ from django.core.cache import cache
 
 from catalog.models import Product
 from .forms import ProductForm
+from .services import ProductListInCategory
 from django.shortcuts import render, get_object_or_404
 
 from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+
+class ProductByCategoryView(ListView):
+    model = Product
+    template_name = 'catalog/products_by_category.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return ProductListInCategory.product_list(category_id)
 
 
 class IsPublishedProductView(LoginRequiredMixin, View):
